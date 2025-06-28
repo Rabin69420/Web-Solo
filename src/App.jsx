@@ -5,6 +5,7 @@ import './App.css'
 import Homepage from './Pages/Homepage'
 import LoginPage from './Pages/Loginpage'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import Signup from './Pages/SignUp'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -18,6 +19,11 @@ function App() {
 
         <Route path='/login' element={<LoginPage></LoginPage>}> 
         </Route>
+
+
+        <Route path='/signup' element={<Signup></Signup>}> 
+        </Route>
+
       </Routes>
       </BrowserRouter>
     </>
