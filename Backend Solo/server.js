@@ -1,6 +1,8 @@
 const express = require("express")
 
 const app = express() // get (READ),post (CREATE),put(Update),delete(Delete),listen (Port)
+
+app.use(express.json())
 app.get("/", (request,response)=>{
     // data 
     //request.body (private)
