@@ -1,3 +1,4 @@
+const { request } = require("express");
 const {body} = require("express-validator")
 
 const registerValidation = [
@@ -9,7 +10,8 @@ const registerValidation = [
     body("password")
     .trim()
     .isLength({min: 8})
-    .withMessage("password must be more than 8 characters")
-]
+    .withMessage("password must be more than 8 characters"),
+
+];
 
 module.exports = { registerValidation };
