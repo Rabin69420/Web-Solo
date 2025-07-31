@@ -1,11 +1,25 @@
-const express = require("express")
-const { registerController, loginController } = require("../controller/authController")
-const { registerValidation } = require("../middleware/validation")
-const {authenticateToken} = require("../middleware/auth")
+const express = require("express");
+const router = express.Router();
+const rateLimit = require("express-rate-limit");
 
-const authRouter = express.Router()
+const authController = require("../controllers/authController.js");
+const { authenticateToken } = require("../middleware/auth.js");
+const { registerValidation, loginValidation } = require("../middleware/validation.js");
 
-authRouter.post("/register", registerValidation, registerController);
-authRouter.post("/login", loginController )
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: {
+    success: false,
+    message: "Too many authentication attempts, please try again later",
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
-module.exports = {authRouter}
+router.post("/register", authLimiter, registerValidation, authController.register);
+router.post("/login", authLimiter, loginValidation, authController.login);
+router.get("/profile", authenticateToken, authController.getProfile);
+router.post("/logout", authenticateToken, authController.logout);
+
+module.exports = router;
