@@ -22,7 +22,7 @@ const AdminHeader = ({ currentPage }) => {
   const isActive = (path) => location.pathname === path;
 
   const handleLogout = () => {
-    navigate('/admin/login');
+    navigate('/signout'); // Changed from '/admin/login' to '/signout'
     setIsProfileDropdownOpen(false);
   };
 
