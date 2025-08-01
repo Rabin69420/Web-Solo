@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import { Bookmark, Home, X } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Bookmark, Home, X, Eye } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import DashboardHeader from '../Components/DashboardHeader';
 import PropertyCard from '../Components/PropertyCard';
-import PropertyDetails from '../Components/PropertyDetails';
 import Footer from '../Components/Footer';
 
 const SavedProperties = () => {
   // Mock bookmarked properties - simulating user has already saved some
   const [bookmarkedProperties, setBookmarkedProperties] = useState([1, 3, 5, 7, 9]);
-  const [selectedProperty, setSelectedProperty] = useState(null);
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [hoveredCard, setHoveredCard] = useState(null);
+
+  const navigate = useNavigate();
 
   // Enhanced property data with different accommodation types
   const [properties] = useState([
@@ -170,18 +170,63 @@ const SavedProperties = () => {
     });
   };
 
+  // STATIC ROUTING: Navigate to /viewdetails (no dynamic ID)
   const handleViewDetails = (property) => {
-    setSelectedProperty(property);
-    setIsDetailsOpen(true);
+    console.log('Navigating to details for:', property);
+    // Navigate to STATIC route '/viewdetails' and pass property data via state
+    navigate('/viewdetails', { 
+      state: { 
+        property: property,
+        bookmarkedProperties: bookmarkedProperties 
+      } 
+    });
   };
 
-  const closeDetails = () => {
-    setIsDetailsOpen(false);
-    setSelectedProperty(null);
-  };
+  // Enhanced PropertyCardWithHover component - REMOVED X BUTTON
+  const PropertyCardWithHover = ({ property }) => {
+    return (
+      <div
+        className="relative group cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-2xl"
+        onMouseEnter={() => setHoveredCard(property.id)}
+        onMouseLeave={() => setHoveredCard(null)}
+        onClick={() => handleViewDetails(property)} // Uses static routing
+      >
+        {/* Hover Overlay with "View Details" */}
+        <div 
+          className={`absolute inset-0 bg-black/60 z-10 flex items-center justify-center rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-300 ${
+            hoveredCard === property.id ? 'backdrop-blur-sm' : ''
+          }`}
+        >
+          <div className="text-center text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+            <Eye className="w-8 h-8 mx-auto mb-2" />
+            <span className="text-lg font-semibold">View Details</span>
+            <p className="text-sm opacity-90 mt-1">Click to explore</p>
+          </div>
+        </div>
 
-  const removeFromSaved = (propertyId) => {
-    setBookmarkedProperties(prev => prev.filter(id => id !== propertyId));
+        {/* Enhanced PropertyCard with better hover states */}
+        <div className="relative">
+          <PropertyCard 
+            property={property} 
+            showBookmarkButton={true} // Keep heart button visible for unsaving
+            bookmarkedProperties={bookmarkedProperties}
+            toggleBookmark={toggleBookmark} // This will handle unsaving when heart is clicked
+            onViewDetails={() => handleViewDetails(property)} // Uses static routing
+            className="group-hover:shadow-xl transition-all duration-300"
+          />
+          
+          {/* Click indicator badge */}
+          <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <span className="text-xs font-medium text-gray-700">Click to view</span>
+          </div>
+
+          {/* Helper text for heart button */}
+          <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <span className="text-xs font-medium text-gray-700">💖 Click heart to unsave</span>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   const bookmarkedPropertiesList = properties.filter(property =>
@@ -200,6 +245,10 @@ const SavedProperties = () => {
             </h2>
             <p className="text-xl text-slate-600">
               {bookmarkedPropertiesList.length} properties you've bookmarked
+            </p>
+            {/* Added helper text */}
+            <p className="text-sm text-gray-500 mt-2">
+              💡 Click the heart icon on any property to remove it from your saved list
             </p>
           </div>
           
@@ -235,24 +284,10 @@ const SavedProperties = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
             {bookmarkedPropertiesList.map(property => (
-              <div key={property.id} className="relative">
-                <PropertyCard 
-                  property={property} 
-                  showBookmarkButton={true}
-                  bookmarkedProperties={bookmarkedProperties}
-                  toggleBookmark={toggleBookmark}
-                  onViewDetails={() => handleViewDetails(property)}
-                />
-                
-                {/* Remove from Saved Button */}
-                <button
-                  onClick={() => removeFromSaved(property.id)}
-                  className="absolute top-2 left-2 p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition-all duration-200 shadow-lg opacity-0 group-hover:opacity-100"
-                  title="Remove from saved"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
+              <PropertyCardWithHover
+                key={property.id}
+                property={property}
+              />
             ))}
           </div>
         )}
@@ -260,15 +295,6 @@ const SavedProperties = () => {
 
       {/* Footer */}
       <Footer />
-
-      {/* Property Details Modal */}
-      <PropertyDetails
-        property={selectedProperty}
-        isOpen={isDetailsOpen}
-        onClose={closeDetails}
-        bookmarkedProperties={bookmarkedProperties}
-        toggleBookmark={toggleBookmark}
-      />
     </div>
   );
 };

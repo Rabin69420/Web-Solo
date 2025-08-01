@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+// Remove ArrowLeft import since we're not using the back button anymore
 import DashboardHeader from '../Components/DashboardHeader';
 import PropertyDetails from '../Components/PropertyDetails';
 import Footer from '../Components/Footer';
@@ -38,7 +38,7 @@ const ViewDetails = () => {
   };
 
   const handleClose = () => {
-    navigate('/overview'); // Go back to overview
+    navigate(-1); // Go back to previous page
   };
 
   // Loading state
@@ -57,7 +57,8 @@ const ViewDetails = () => {
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       <DashboardHeader currentPage="viewdetails" bookmarkedCount={bookmarkedProperties.length} />
       
-      {/* Back Navigation */}
+      {/* REMOVE THIS ENTIRE SECTION - Back Navigation */}
+      {/* 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-8">
         <button
           onClick={handleClose}
@@ -67,9 +68,10 @@ const ViewDetails = () => {
           Back to Properties
         </button>
       </div>
+      */}
 
       {/* Property Details - Full Page */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16">
         <PropertyDetails
           property={property}
           isOpen={true}

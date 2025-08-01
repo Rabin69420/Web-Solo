@@ -14,6 +14,8 @@ import AdminUsers from './Admin/Pages/UserManagement';
 import AdminDashboard from './Admin/Pages/AdminOverview';
 import PropertiesDashboard from './Admin/Pages/PropertyManagement';
 import ViewDetails from './User/Components/viewdetails';
+import AdminViewDetails from './Admin/Components/AdminViewDetails';
+import UserViewDetails from './Admin/Components/UserViewDetails';
 
 function App() {
   return (
@@ -34,6 +36,8 @@ function App() {
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/properties" element={<PropertiesDashboard />} />
         <Route path="/admin/users" element={<AdminUsers />} />
+        <Route path="/admin/viewdetails" element={<AdminViewDetails />} />
+        <Route path="/admin/viewuserdetails" element={<UserViewDetails />} />
       </Routes>
     </Router>
   );
