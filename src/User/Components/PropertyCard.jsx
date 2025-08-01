@@ -70,8 +70,6 @@ const PropertyCard = ({
           <span className="ml-2 text-slate-700">{getAccommodationLabel(property)}</span>
         </div>
 
-        {/* Removed availability badge for room-based properties */}
-
         {showBookmarkButton && (
           <button
             onClick={(e) => {

@@ -1,33 +1,42 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import Homepage from './Pages/Homepage'
-import LoginPage from './Pages/Loginpage'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import Signup from './Pages/SignUp'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import RentalHomepage from './User/Pages/Homepage';
+import AboutUs from './User/Components/About';
+import Services from './User/Components/Services';
+import Login from './User/Pages/Login';
+import Signup from './User/Pages/Signup';
+import ContactPage from './User/Components/Contact';
+import Overview from './User/Pages/Overview';
+import BrowseProperties from './User/Pages/BrowseProperties';
+import SavedProperties from './User/Pages/SavedProperties';
+import ProfilePage from './User/Pages/Profile';
+import SignOut from './User/Pages/Signout';
+import AdminUsers from './Admin/Pages/UserManagement';
+import AdminDashboard from './Admin/Pages/AdminOverview';
+import PropertiesDashboard from './Admin/Pages/PropertyManagement';
+import ViewDetails from './User/Components/viewdetails';
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <BrowserRouter>
+    <Router>
       <Routes>
-        <Route path='/' element={<Homepage></Homepage>}> 
-        </Route>
-
-        <Route path='/login' element={<LoginPage></LoginPage>}> 
-        </Route>
-
-
-        <Route path='/signup' element={<Signup></Signup>}> 
-        </Route>
-
+        <Route path="/" element={<RentalHomepage />} />
+        <Route path="/about" element={<AboutUs />} />
+        <Route path="/services" element={<Services />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/viewdetails" element={<ViewDetails />} />
+        <Route path="/overview" element={<Overview />} />
+        <Route path="/browse" element={<BrowseProperties />} />
+        <Route path="/saved" element={<SavedProperties />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/signout" element={<SignOut />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/properties" element={<PropertiesDashboard />} />
+        <Route path="/admin/users" element={<AdminUsers />} />
       </Routes>
-      </BrowserRouter>
-    </>
-  )
+    </Router>
+  );
 }
 
-export default App
+export default App;

@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowRight, Home, Bookmark } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { ArrowRight, Home, Bookmark, Eye } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import DashboardHeader from '../Components/DashboardHeader';
 import PropertyCard from '../Components/PropertyCard';
-import PropertyDetails from '../Components/PropertyDetails';
 import Footer from '../Components/Footer';
 
 const Overview = () => {
   const [bookmarkedProperties, setBookmarkedProperties] = useState([]);
-  const [selectedProperty, setSelectedProperty] = useState(null);
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [hoveredCard, setHoveredCard] = useState(null);
+  const navigate = useNavigate(); // Navigation hook for static routing
 
   // Enhanced property data with availability status
   const [properties] = useState([
@@ -147,23 +146,64 @@ const Overview = () => {
     });
   };
 
+  // STATIC ROUTING: Navigate to /viewdetails (no dynamic ID)
   const handleViewDetails = (property) => {
-    setSelectedProperty(property);
-    setIsDetailsOpen(true);
+    console.log('Navigating to details for:', property);
+    // Navigate to STATIC route '/viewdetails' and pass property data via state
+    navigate('/viewdetails', { 
+      state: { 
+        property: property,
+        bookmarkedProperties: bookmarkedProperties 
+      } 
+    });
   };
 
-  const closeDetails = () => {
-    setIsDetailsOpen(false);
-    setSelectedProperty(null);
+  // Enhanced PropertyCardWithHover component
+  const PropertyCardWithHover = ({ property, showBookmarkButton = true, className = "" }) => {
+    return (
+      <div
+        className={`relative group cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-2xl ${className}`}
+        onMouseEnter={() => setHoveredCard(property.id)}
+        onMouseLeave={() => setHoveredCard(null)}
+        onClick={() => handleViewDetails(property)} // Uses static routing
+      >
+        {/* Hover Overlay with "View Details" */}
+        <div 
+          className={`absolute inset-0 bg-black/60 z-10 flex items-center justify-center rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-300 ${
+            hoveredCard === property.id ? 'backdrop-blur-sm' : ''
+          }`}
+        >
+          <div className="text-center text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+            <Eye className="w-8 h-8 mx-auto mb-2" />
+            <span className="text-lg font-semibold">View Details</span>
+            <p className="text-sm opacity-90 mt-1">Click to explore</p>
+          </div>
+        </div>
+
+        {/* Enhanced PropertyCard with better hover states */}
+        <div className="relative">
+          <PropertyCard 
+            property={property} 
+            bookmarkedProperties={bookmarkedProperties}
+            toggleBookmark={toggleBookmark}
+            onViewDetails={() => handleViewDetails(property)} // Uses static routing
+            showBookmarkButton={showBookmarkButton}
+            className="group-hover:shadow-xl transition-all duration-300"
+          />
+          
+          {/* Click indicator badge */}
+          <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <span className="text-xs font-medium text-gray-700">Click to view</span>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   const featuredProperties = properties.filter(property => property.isFeatured);
   const bookmarkedPropertiesList = properties.filter(property =>
     bookmarkedProperties.includes(property.id)
   );
-
-  console.log('Featured Properties:', featuredProperties); // Debug
-  console.log('All Properties:', properties); // Debug
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
@@ -192,13 +232,19 @@ const Overview = () => {
               find the perfect accommodation for your lifestyle and budget.
             </p>
           </div>
+
+          {/* Interactive Hint - Updated text for static routing */}
+          <div className="bg-white/80 backdrop-blur-sm rounded-full px-6 py-3 inline-flex items-center shadow-lg border border-amber-200">
+            <Eye className="w-5 h-5 text-amber-600 mr-2" />
+            <span className="text-amber-800 font-medium">Click any property card to view full details page</span>
+          </div>
         </div>
       </section>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="space-y-16">
-          {/* Accommodation Types Showcase - Moved to First Position */}
+          {/* Accommodation Types Showcase */}
           <div>
             <div className="text-center mb-12">
               <h2 className="text-4xl font-serif font-bold text-slate-900 mb-4">
@@ -248,7 +294,7 @@ const Overview = () => {
             </div>
           </div>
 
-          {/* Featured Listings Section - Now Second Position */}
+          {/* Featured Listings Section */}
           <div>
             <div className="flex items-center justify-between mb-8">
               <div>
@@ -256,7 +302,7 @@ const Overview = () => {
                   Featured Listings
                 </h2>
                 <p className="text-xl text-slate-600">
-                  Our most exceptional and sought-after properties across all accommodation types
+                  Our most exceptional and sought-after properties - click to explore details
                 </p>
               </div>
               <Link
@@ -271,12 +317,9 @@ const Overview = () => {
             {featuredProperties.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {featuredProperties.slice(0, 3).map(property => (
-                  <PropertyCard 
-                    key={property.id} 
-                    property={property} 
-                    bookmarkedProperties={bookmarkedProperties}
-                    toggleBookmark={toggleBookmark}
-                    onViewDetails={() => handleViewDetails(property)}
+                  <PropertyCardWithHover
+                    key={property.id}
+                    property={property}
                   />
                 ))}
               </div>
@@ -287,7 +330,7 @@ const Overview = () => {
             )}
           </div>
 
-          {/* All Properties Preview - Limited to 4 */}
+          {/* All Properties Preview */}
           <div>
             <div className="flex items-center justify-between mb-8">
               <div>
@@ -295,7 +338,7 @@ const Overview = () => {
                   Explore All Accommodations
                 </h2>
                 <p className="text-xl text-slate-600">
-                  Browse houses, flats, apartments, and single rooms
+                  Browse houses, flats, apartments, and single rooms - click any card for details
                 </p>
               </div>
               <Link
@@ -310,12 +353,9 @@ const Overview = () => {
             {properties.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {properties.slice(0, 4).map(property => (
-                  <PropertyCard 
-                    key={property.id} 
+                  <PropertyCardWithHover
+                    key={property.id}
                     property={property}
-                    bookmarkedProperties={bookmarkedProperties}
-                    toggleBookmark={toggleBookmark}
-                    onViewDetails={() => handleViewDetails(property)}
                   />
                 ))}
               </div>
@@ -335,7 +375,7 @@ const Overview = () => {
                     Your Saved Properties
                   </h2>
                   <p className="text-xl text-slate-600">
-                    Properties you've bookmarked for later
+                    Properties you've bookmarked - click to view details
                   </p>
                 </div>
                 <Link
@@ -349,13 +389,10 @@ const Overview = () => {
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {bookmarkedPropertiesList.slice(0, 3).map(property => (
-                  <PropertyCard 
-                    key={property.id} 
-                    property={property} 
+                  <PropertyCardWithHover
+                    key={property.id}
+                    property={property}
                     showBookmarkButton={false}
-                    bookmarkedProperties={bookmarkedProperties}
-                    toggleBookmark={toggleBookmark}
-                    onViewDetails={() => handleViewDetails(property)}
                   />
                 ))}
               </div>
@@ -385,15 +422,6 @@ const Overview = () => {
 
       {/* Footer */}
       <Footer />
-
-      {/* Property Details Modal */}
-      <PropertyDetails
-        property={selectedProperty}
-        isOpen={isDetailsOpen}
-        onClose={closeDetails}
-        bookmarkedProperties={bookmarkedProperties}
-        toggleBookmark={toggleBookmark}
-      />
     </div>
   );
 };

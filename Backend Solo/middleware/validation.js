@@ -50,7 +50,47 @@ const loginValidation = [
   body("password").notEmpty().withMessage("Password is required"),
 ];
 
+// Property validation
+const propertyValidation = [
+  body("title")
+    .trim()
+    .isLength({ min: 3, max: 200 })
+    .withMessage("Property title must be between 3 and 200 characters"),
+
+  body("location")
+    .trim()
+    .notEmpty()
+    .withMessage("Location is required"),
+
+  body("price")
+    .isNumeric()
+    .isFloat({ min: 0 })
+    .withMessage("Price must be a positive number"),
+
+  body("type")
+    .isIn(["apartment", "house", "studio", "room"])
+    .withMessage("Invalid property type"),
+
+  body("bedrooms")
+    .isInt({ min: 1, max: 10 })
+    .withMessage("Bedrooms must be between 1 and 10"),
+
+  body("bathrooms")
+    .isInt({ min: 1, max: 10 })
+    .withMessage("Bathrooms must be between 1 and 10"),
+
+  body("maxOccupancy")
+    .isInt({ min: 1, max: 20 })
+    .withMessage("Max occupancy must be between 1 and 20"),
+
+  body("description")
+    .trim()
+    .isLength({ min: 10 })
+    .withMessage("Description must be at least 10 characters long"),
+];
+
 module.exports = {
   registerValidation,
   loginValidation,
+  propertyValidation,
 };
