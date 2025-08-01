@@ -19,11 +19,11 @@ const Login = () => {
     // Form submission logic without backend
     console.log('Login data:', data);
     
-    // Show success message
-    alert("Login successful! (Demo mode)");
+    // Show a simple alert message
+    alert("Login successful");
     
-    // Navigate to homepage or dashboard
-    navigate("/");
+    // Navigate to the overview page
+    navigate("/overview");
   };
 
   return (
