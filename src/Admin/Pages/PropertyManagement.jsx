@@ -13,17 +13,21 @@ import {
   Search,
   X
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom'; // Add this import for navigation
 import AddProperty from '../Components/AddProperty';
 import PropertyPhotoManager from '../Components/PropertyPhotoManager';
-import PropertyDetailsModal from '../Components/PropertydetailsModel';
+// Remove PropertyDetailsModal import since we're using static routing
 import AdminDashboardHeader from '../Components/AdminDashboardHeader';
 
 const PropertiesDashboard = () => {
+  const navigate = useNavigate(); // Add navigation hook
+  
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingProperty, setEditingProperty] = useState(null);
-  const [showViewModal, setShowViewModal] = useState(false);
-  const [viewingProperty, setViewingProperty] = useState(null);
+  // Remove showViewModal and viewingProperty states - no longer needed
+  
+  const [bookmarkedProperties, setBookmarkedProperties] = useState([]); // Add for admin bookmarks
 
   // Filter states
   const [searchTerm, setSearchTerm] = useState('');
@@ -142,14 +146,29 @@ const PropertiesDashboard = () => {
     setEditingProperty(null);
   };
 
-  // View Details
-  const handleViewProperty = (p) => {
-    setViewingProperty(p);
-    setShowViewModal(true);
+  // UPDATED: View Details with Static Routing
+  const handleViewProperty = (property) => {
+    console.log('Navigating to admin property details for:', property);
+    // Navigate to STATIC admin route '/admin/viewdetails' and pass property data via state
+    navigate('/admin/viewdetails', { 
+      state: { 
+        property: property,
+        bookmarkedProperties: bookmarkedProperties 
+      } 
+    });
   };
-  const handleViewModalClose = () => {
-    setShowViewModal(false);
-    setViewingProperty(null);
+
+  // Remove handleViewModalClose - no longer needed
+
+  // Bookmark functionality for admin (optional)
+  const toggleBookmark = (propertyId) => {
+    setBookmarkedProperties(prev => {
+      if (prev.includes(propertyId)) {
+        return prev.filter(id => id !== propertyId);
+      } else {
+        return [...prev, propertyId];
+      }
+    });
   };
 
   // Toggle Status Function
@@ -510,7 +529,7 @@ const PropertiesDashboard = () => {
         </div>
       </div>
 
-      {/* Modals */}
+      {/* Modals - Only Add and Edit modals remain */}
       <AddProperty
         isOpen={showAddModal}
         onClose={handleAddModalClose}
@@ -525,13 +544,7 @@ const PropertiesDashboard = () => {
         />
       )}
 
-      {showViewModal && (
-        <PropertyDetailsModal
-          isOpen={showViewModal}
-          property={viewingProperty}
-          onClose={handleViewModalClose}
-        />
-      )}
+      {/* Remove PropertyDetailsModal - no longer needed */}
     </div>
   );
 };

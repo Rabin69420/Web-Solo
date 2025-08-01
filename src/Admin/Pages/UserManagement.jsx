@@ -3,7 +3,6 @@ import {
   Users, 
   Search, 
   Eye,
-  Edit,
   Trash2,
   UserCheck,
   UserX,
@@ -13,61 +12,171 @@ import {
   Shield,
   Crown
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import AdminHeader from '../Components/AdminDashboardHeader';
 
 const AdminUsers = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  // Simplified mock users data
+  // Enhanced mock users data with more details
   const [users, setUsers] = useState([
     {
       id: 1,
       name: 'John Smith',
+      fullName: 'John Michael Smith',
       email: 'john.smith@example.com',
       phone: '+1 (555) 123-4567',
+      address: '123 Main Street, New York, NY 10001',
       status: 'active',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face'
+      verified: true,
+      accountType: 'Premium',
+      joinDate: '2024-01-15',
+      lastActive: '2024-01-20',
+      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
+      preferences: {
+        propertyType: 'Apartment',
+        priceRange: '$2000-$5000',
+        location: 'Downtown',
+        bedrooms: '2-3'
+      },
+      statistics: {
+        propertiesViewed: 25,
+        inquiriesSent: 8,
+        bookmarkedProperties: 5,
+        accountAge: '6 months'
+      }
     },
     {
       id: 2,
       name: 'Sarah Wilson',
+      fullName: 'Sarah Elizabeth Wilson',
       email: 'sarah.wilson@example.com',
       phone: '+1 (555) 234-5678',
+      address: '456 Oak Avenue, Los Angeles, CA 90210',
       status: 'active',
-      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b05b?w=100&h=100&fit=crop&crop=face'
+      verified: true,
+      accountType: 'Standard',
+      joinDate: '2024-01-10',
+      lastActive: '2024-01-19',
+      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b05b?w=100&h=100&fit=crop&crop=face',
+      preferences: {
+        propertyType: 'House',
+        priceRange: '$3000-$7000',
+        location: 'Suburbs',
+        bedrooms: '3-4'
+      },
+      statistics: {
+        propertiesViewed: 18,
+        inquiriesSent: 4,
+        bookmarkedProperties: 3,
+        accountAge: '6 months'
+      }
     },
     {
       id: 3,
       name: 'Mike Johnson',
+      fullName: 'Michael Robert Johnson',
       email: 'mike.johnson@example.com',
       phone: '+1 (555) 345-6789',
+      address: '789 Pine Street, Chicago, IL 60601',
       status: 'suspended',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face'
+      verified: false,
+      accountType: 'Standard',
+      joinDate: '2024-01-05',
+      lastActive: '2024-01-18',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
+      preferences: {
+        propertyType: 'Studio',
+        priceRange: '$1000-$2500',
+        location: 'City Center',
+        bedrooms: '1'
+      },
+      statistics: {
+        propertiesViewed: 12,
+        inquiriesSent: 2,
+        bookmarkedProperties: 1,
+        accountAge: '6 months'
+      }
     },
     {
       id: 4,
       name: 'Emma Davis',
+      fullName: 'Emma Grace Davis',
       email: 'emma.davis@example.com',
       phone: '+1 (555) 456-7890',
+      address: '321 Elm Street, Miami, FL 33101',
       status: 'active',
-      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face'
+      verified: true,
+      accountType: 'Premium',
+      joinDate: '2023-12-20',
+      lastActive: '2024-01-21',
+      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
+      preferences: {
+        propertyType: 'Apartment',
+        priceRange: '$2500-$4500',
+        location: 'Beachfront',
+        bedrooms: '2'
+      },
+      statistics: {
+        propertiesViewed: 32,
+        inquiriesSent: 12,
+        bookmarkedProperties: 8,
+        accountAge: '7 months'
+      }
     },
     {
       id: 5,
       name: 'Alex Brown',
+      fullName: 'Alexander James Brown',
       email: 'alex.brown@example.com',
       phone: '+1 (555) 567-8901',
+      address: '654 Maple Drive, Seattle, WA 98101',
       status: 'active',
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face'
+      verified: true,
+      accountType: 'Standard',
+      joinDate: '2024-01-01',
+      lastActive: '2024-01-22',
+      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face',
+      preferences: {
+        propertyType: 'House',
+        priceRange: '$4000-$8000',
+        location: 'Suburban',
+        bedrooms: '4+'
+      },
+      statistics: {
+        propertiesViewed: 20,
+        inquiriesSent: 6,
+        bookmarkedProperties: 4,
+        accountAge: '1 month'
+      }
     },
     {
       id: 6,
       name: 'Lisa Chen',
+      fullName: 'Lisa Michelle Chen',
       email: 'lisa.chen@example.com',
       phone: '+1 (555) 678-9012',
+      address: '987 Cedar Lane, Boston, MA 02101',
       status: 'active',
-      avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face'
+      verified: false,
+      accountType: 'Standard',
+      joinDate: '2023-12-15',
+      lastActive: '2024-01-20',
+      avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face',
+      preferences: {
+        propertyType: 'Apartment',
+        priceRange: '$1800-$3500',
+        location: 'University Area',
+        bedrooms: '1-2'
+      },
+      statistics: {
+        propertiesViewed: 15,
+        inquiriesSent: 3,
+        bookmarkedProperties: 2,
+        accountAge: '7 months'
+      }
     }
   ]);
 
@@ -77,6 +186,16 @@ const AdminUsers = () => {
     const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
+
+  // View user details - navigate to admin user details page
+  const handleViewUser = (user) => {
+    console.log('Navigating to admin user details for:', user);
+    navigate('/admin/viewuserdetails', { 
+      state: { 
+        user: user
+      } 
+    });
+  };
 
   const handleSuspendUser = (userId) => {
     setUsers(prevUsers =>
@@ -215,13 +334,24 @@ const AdminUsers = () => {
                 </div>
                 
                 {/* Status Badge */}
-                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                  user.status === 'active'
-                    ? 'bg-green-100 text-green-700 border border-green-200'
-                    : 'bg-red-100 text-red-700 border border-red-200'
-                }`}>
-                  {user.status}
-                </span>
+                <div className="flex flex-col items-end space-y-2">
+                  <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                    user.status === 'active'
+                      ? 'bg-green-100 text-green-700 border border-green-200'
+                      : 'bg-red-100 text-red-700 border border-red-200'
+                  }`}>
+                    {user.status}
+                  </span>
+                  
+                  {/* Account Type Badge */}
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    user.accountType === 'Premium'
+                      ? 'bg-amber-100 text-amber-700 border border-amber-200'
+                      : 'bg-gray-100 text-gray-700 border border-gray-200'
+                  }`}>
+                    {user.accountType}
+                  </span>
+                </div>
               </div>
 
               {/* Contact Info */}
@@ -240,14 +370,15 @@ const AdminUsers = () => {
                 </div>
               </div>
 
-              {/* Action Buttons */}
+              {/* Action Buttons - Edit Button Removed */}
               <div className="flex items-center justify-between pt-4 border-t border-slate-200">
                 <div className="flex items-center space-x-2">
-                  <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200">
+                  <button 
+                    onClick={() => handleViewUser(user)}
+                    className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all duration-200"
+                    title="View User Details"
+                  >
                     <Eye className="w-4 h-4" />
-                  </button>
-                  <button className="p-2 text-slate-400 hover:text-green-600 hover:bg-green-50 rounded-xl transition-all duration-200">
-                    <Edit className="w-4 h-4" />
                   </button>
                 </div>
                 
@@ -259,6 +390,7 @@ const AdminUsers = () => {
                         ? 'text-slate-400 hover:text-orange-600 hover:bg-orange-50'
                         : 'text-slate-400 hover:text-green-600 hover:bg-green-50'
                     }`}
+                    title={user.status === 'active' ? 'Suspend User' : 'Activate User'}
                   >
                     {user.status === 'active' ? (
                       <UserX className="w-4 h-4" />
@@ -269,6 +401,7 @@ const AdminUsers = () => {
                   <button
                     onClick={() => handleDeleteUser(user.id)}
                     className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200"
+                    title="Delete User"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>

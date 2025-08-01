@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   X, 
@@ -23,14 +22,45 @@ const PropertyPhotoManager = ({
     bedrooms: property?.bedrooms || 1,
     bathrooms: property?.bathrooms || 1,
     maxOccupancy: property?.maxOccupancy || 2,
-    description: property?.description || ''
+    description: property?.description || '',
+    host: {
+      name: property?.host?.name || '',
+      phone: property?.host?.phone || '',
+      email: property?.host?.email || ''
+    }
   });
+
+  const [errors, setErrors] = useState({});
 
   const handleInputChange = (field, value) => {
     setPropertyData(prev => ({
       ...prev,
       [field]: value
     }));
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({
+        ...prev,
+        [field]: ''
+      }));
+    }
+  };
+
+  const handleHostChange = (field, value) => {
+    setPropertyData(prev => ({
+      ...prev,
+      host: {
+        ...prev.host,
+        [field]: value
+      }
+    }));
+    // Clear error when user starts typing
+    if (errors[`host.${field}`]) {
+      setErrors(prev => ({
+        ...prev,
+        [`host.${field}`]: ''
+      }));
+    }
   };
 
   const handlePhotoUpload = (event) => {
@@ -72,7 +102,51 @@ const PropertyPhotoManager = ({
     });
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!propertyData.title.trim()) {
+      newErrors.title = 'Property title is required';
+    }
+
+    if (!propertyData.location.trim()) {
+      newErrors.location = 'Location is required';
+    }
+
+    if (!propertyData.price || propertyData.price <= 0) {
+      newErrors.price = 'Valid price is required';
+    }
+
+    if (!propertyData.description.trim()) {
+      newErrors.description = 'Description is required';
+    }
+
+    // Validate host information
+    if (!propertyData.host.name.trim()) {
+      newErrors['host.name'] = 'Host name is required';
+    }
+
+    if (!propertyData.host.phone.trim()) {
+      newErrors['host.phone'] = 'Host phone number is required';
+    } else if (!/^\+?[\d\s\-\(\)]+$/.test(propertyData.host.phone)) {
+      newErrors['host.phone'] = 'Please enter a valid phone number';
+    }
+
+    if (!propertyData.host.email.trim()) {
+      newErrors['host.email'] = 'Host email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(propertyData.host.email)) {
+      newErrors['host.email'] = 'Please enter a valid email address';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSave = () => {
+    if (!validateForm()) {
+      return;
+    }
+
     const updatedProperty = {
       ...propertyData,
       images: photos.map(p => p.url)
@@ -90,7 +164,7 @@ const PropertyPhotoManager = ({
       
       {/* Modal Content */}
       <div className="relative min-h-screen px-4 py-8 flex items-center justify-center">
-        <div className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl p-8 max-h-[90vh] overflow-y-auto">
+        <div className="relative w-full max-w-6xl bg-white rounded-3xl shadow-2xl p-8 max-h-[90vh] overflow-y-auto">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-serif font-bold text-gray-900">
@@ -104,111 +178,188 @@ const PropertyPhotoManager = ({
             </button>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Property Information */}
-            <div className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Property Information - Wider Column */}
+            <div className="lg:col-span-2 space-y-6">
               <h3 className="text-lg font-semibold text-gray-900">Property Details</h3>
               
               {/* Basic Information */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Property Title *</label>
-                <input
-                  type="text"
-                  value={propertyData.title}
-                  onChange={(e) => handleInputChange('title', e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
-                  placeholder="Enter property title"
-                />
+              <div className="bg-gray-50 rounded-2xl p-6">
+                <h4 className="text-md font-semibold text-gray-900 mb-4">Basic Information</h4>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Property Title *</label>
+                    <input
+                      type="text"
+                      value={propertyData.title}
+                      onChange={(e) => handleInputChange('title', e.target.value)}
+                      className={`w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none ${
+                        errors.title ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                      placeholder="Enter property title"
+                    />
+                    {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title}</p>}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Location *</label>
+                    <input
+                      type="text"
+                      value={propertyData.location}
+                      onChange={(e) => handleInputChange('location', e.target.value)}
+                      className={`w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none ${
+                        errors.location ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                      placeholder="Enter full address"
+                    />
+                    {errors.location && <p className="text-red-500 text-xs mt-1">{errors.location}</p>}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">Property Type</label>
+                      <select
+                        value={propertyData.type}
+                        onChange={(e) => handleInputChange('type', e.target.value)}
+                        className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+                      >
+                        <option value="apartment">Apartment</option>
+                        <option value="house">House</option>
+                        <option value="studio">Studio</option>
+                        <option value="room">Room</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">Monthly Rent ($) *</label>
+                      <input
+                        type="number"
+                        value={propertyData.price}
+                        onChange={(e) => handleInputChange('price', e.target.value)}
+                        className={`w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none ${
+                          errors.price ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="0"
+                      />
+                      {errors.price && <p className="text-red-500 text-xs mt-1">{errors.price}</p>}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">Bedrooms</label>
+                      <select
+                        value={propertyData.bedrooms}
+                        onChange={(e) => handleInputChange('bedrooms', parseInt(e.target.value))}
+                        className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+                      >
+                        {[1,2,3,4,5,6].map(num => (
+                          <option key={num} value={num}>{num}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">Bathrooms</label>
+                      <select
+                        value={propertyData.bathrooms}
+                        onChange={(e) => handleInputChange('bathrooms', parseInt(e.target.value))}
+                        className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+                      >
+                        {[1,2,3,4,5,6].map(num => (
+                          <option key={num} value={num}>{num}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">Max Guests</label>
+                      <select
+                        value={propertyData.maxOccupancy}
+                        onChange={(e) => handleInputChange('maxOccupancy', parseInt(e.target.value))}
+                        className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+                      >
+                        {[1,2,3,4,5,6,7,8,9,10,12,15].map(num => (
+                          <option key={num} value={num}>{num}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Location *</label>
-                <input
-                  type="text"
-                  value={propertyData.location}
-                  onChange={(e) => handleInputChange('location', e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
-                  placeholder="Enter full address"
-                />
+              {/* Host Information Section - NEW */}
+              <div className="bg-blue-50 rounded-2xl p-6">
+                <h4 className="text-md font-semibold text-gray-900 mb-4">Host Information</h4>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Host Name *
+                    </label>
+                    <input
+                      type="text"
+                      value={propertyData.host.name}
+                      onChange={(e) => handleHostChange('name', e.target.value)}
+                      className={`w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none ${
+                        errors['host.name'] ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                      placeholder="Enter host's full name"
+                    />
+                    {errors['host.name'] && <p className="text-red-500 text-xs mt-1">{errors['host.name']}</p>}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Host Phone *
+                      </label>
+                      <input
+                        type="tel"
+                        value={propertyData.host.phone}
+                        onChange={(e) => handleHostChange('phone', e.target.value)}
+                        className={`w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none ${
+                          errors['host.phone'] ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="e.g., +1 (555) 123-4567"
+                      />
+                      {errors['host.phone'] && <p className="text-red-500 text-xs mt-1">{errors['host.phone']}</p>}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Host Email *
+                      </label>
+                      <input
+                        type="email"
+                        value={propertyData.host.email}
+                        onChange={(e) => handleHostChange('email', e.target.value)}
+                        className={`w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none ${
+                          errors['host.email'] ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="host@example.com"
+                      />
+                      {errors['host.email'] && <p className="text-red-500 text-xs mt-1">{errors['host.email']}</p>}
+                    </div>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 mt-3">
+                  This information will be displayed to potential tenants for contact purposes
+                </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Property Type</label>
-                  <select
-                    value={propertyData.type}
-                    onChange={(e) => handleInputChange('type', e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
-                  >
-                    <option value="apartment">Apartment</option>
-                    <option value="house">House</option>
-                    <option value="studio">Studio</option>
-                    <option value="room">Room</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Monthly Rent ($) *</label>
-                  <input
-                    type="number"
-                    value={propertyData.price}
-                    onChange={(e) => handleInputChange('price', e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
-                    placeholder="0"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Bedrooms</label>
-                  <select
-                    value={propertyData.bedrooms}
-                    onChange={(e) => handleInputChange('bedrooms', parseInt(e.target.value))}
-                    className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
-                  >
-                    {[1,2,3,4,5,6].map(num => (
-                      <option key={num} value={num}>{num}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Bathrooms</label>
-                  <select
-                    value={propertyData.bathrooms}
-                    onChange={(e) => handleInputChange('bathrooms', parseInt(e.target.value))}
-                    className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
-                  >
-                    {[1,2,3,4,5,6].map(num => (
-                      <option key={num} value={num}>{num}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Max Guests</label>
-                  <select
-                    value={propertyData.maxOccupancy}
-                    onChange={(e) => handleInputChange('maxOccupancy', parseInt(e.target.value))}
-                    className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
-                  >
-                    {[1,2,3,4,5,6,7,8,9,10,12,15].map(num => (
-                      <option key={num} value={num}>{num}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Description</label>
+              {/* Description */}
+              <div className="bg-gray-50 rounded-2xl p-6">
+                <h4 className="text-md font-semibold text-gray-900 mb-4">Description</h4>
                 <textarea
                   value={propertyData.description}
                   onChange={(e) => handleInputChange('description', e.target.value)}
                   rows={4}
-                  className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none resize-none"
+                  className={`w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none resize-none ${
+                    errors.description ? 'border-red-500' : 'border-gray-300'
+                  }`}
                   placeholder="Describe the property..."
                 />
+                {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
               </div>
             </div>
 

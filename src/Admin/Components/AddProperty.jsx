@@ -20,7 +20,12 @@ const AddProperty = ({ isOpen, onClose, onAddProperty }) => {
     maxOccupancy: 2,
     description: '',
     image: '',
-    houseRules: [''] // Initialize with one empty rule
+    houseRules: [''], // Initialize with one empty rule
+    host: {
+      name: '',
+      phone: '',
+      email: ''
+    }
   });
 
   const [errors, setErrors] = useState({});
@@ -35,6 +40,23 @@ const AddProperty = ({ isOpen, onClose, onAddProperty }) => {
       setErrors(prev => ({
         ...prev,
         [field]: ''
+      }));
+    }
+  };
+
+  const handleHostChange = (field, value) => {
+    setNewProperty(prev => ({
+      ...prev,
+      host: {
+        ...prev.host,
+        [field]: value
+      }
+    }));
+    // Clear error when user starts typing
+    if (errors[`host.${field}`]) {
+      setErrors(prev => ({
+        ...prev,
+        [`host.${field}`]: ''
       }));
     }
   };
@@ -105,6 +127,23 @@ const AddProperty = ({ isOpen, onClose, onAddProperty }) => {
       newErrors.description = 'Description is required';
     }
 
+    // Validate host information
+    if (!newProperty.host.name.trim()) {
+      newErrors['host.name'] = 'Host name is required';
+    }
+
+    if (!newProperty.host.phone.trim()) {
+      newErrors['host.phone'] = 'Host phone number is required';
+    } else if (!/^\+?[\d\s\-\(\)]+$/.test(newProperty.host.phone)) {
+      newErrors['host.phone'] = 'Please enter a valid phone number';
+    }
+
+    if (!newProperty.host.email.trim()) {
+      newErrors['host.email'] = 'Host email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newProperty.host.email)) {
+      newErrors['host.email'] = 'Please enter a valid email address';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -139,7 +178,12 @@ const AddProperty = ({ isOpen, onClose, onAddProperty }) => {
       maxOccupancy: 2,
       description: '',
       image: '',
-      houseRules: ['']
+      houseRules: [''],
+      host: {
+        name: '',
+        phone: '',
+        email: ''
+      }
     });
     setErrors({});
   };
@@ -302,6 +346,63 @@ const AddProperty = ({ isOpen, onClose, onAddProperty }) => {
                     </select>
                   </div>
                 </div>
+              </div>
+
+              {/* Host Information Section - NEW */}
+              <div className="bg-blue-50 rounded-2xl p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Host Information</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Host Name *
+                    </label>
+                    <input
+                      type="text"
+                      value={newProperty.host.name}
+                      onChange={(e) => handleHostChange('name', e.target.value)}
+                      className={`w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none ${
+                        errors['host.name'] ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                      placeholder="Enter host's full name"
+                    />
+                    {errors['host.name'] && <p className="text-red-500 text-xs mt-1">{errors['host.name']}</p>}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Host Phone *
+                    </label>
+                    <input
+                      type="tel"
+                      value={newProperty.host.phone}
+                      onChange={(e) => handleHostChange('phone', e.target.value)}
+                      className={`w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none ${
+                        errors['host.phone'] ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                      placeholder="e.g., +1 (555) 123-4567"
+                    />
+                    {errors['host.phone'] && <p className="text-red-500 text-xs mt-1">{errors['host.phone']}</p>}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Host Email *
+                    </label>
+                    <input
+                      type="email"
+                      value={newProperty.host.email}
+                      onChange={(e) => handleHostChange('email', e.target.value)}
+                      className={`w-full p-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none ${
+                        errors['host.email'] ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                      placeholder="host@example.com"
+                    />
+                    {errors['host.email'] && <p className="text-red-500 text-xs mt-1">{errors['host.email']}</p>}
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 mt-3">
+                  This information will be displayed to potential tenants for contact purposes
+                </p>
               </div>
 
               {/* Description Section */}
